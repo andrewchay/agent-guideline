@@ -194,63 +194,59 @@ When establishing a new project, include these two files for consistent context 
 
 ### CLAUDE.md
 
-Provides context to Claude Code when working in the directory.
+**必需文件**：每个 Agent 项目必须创建 `CLAUDE.md`，作为 AI Agent（Claude Code、Kimi CLI 等）的工作指南。
+
+**使用模板**：复制 `CLAUDE.md` 作为模板，根据项目需求调整。
+
+#### CLAUDE.md 核心结构
 
 ```markdown
 # CLAUDE.md
 
-This file provides context to Claude Code when working in this directory.
+AI Agent 工作指南
 
 ---
 
-## Role
+## 1. 角色定义
+Claude should act as: [角色]
 
-Claude should act as: [Your preferred role]
+## 2. 关键文件速查
+| 文件 | 用途 | AI 权限 |
 
----
+## 3. 会话启动检查清单
+每次启动时必须执行...
 
-## Key Files
+## 4. 多实例并行开发（Git Worktree）
+[如需要并行开发，保留此章节]
 
-| File | Purpose |
-|------|---------|
-| `PROGRESS.md` | Dashboard of all active projects |
+## 5. 经验教训沉淀
+[记录模板和原则]
 
----
+## 6. 目录结构规范
 
-## Current Focus
+## 7. 快速命令参考
 
-**Primary:** [Main project/goal]
-**Secondary:** [Next priority]
+## 8. 禁止事项
 
----
+## 9. 项目特定上下文
+[填写项目信息]
 
-## Rules
-
-1. [Rule 1]
-2. [Rule 2]
-3. [Rule 3]
-
----
-
-## Session Start Protocol
-
-When starting a new session:
-1. Read `PROGRESS.md` to understand current state
-2. [Add your own checks]
-
----
-
-## Project-Specific Context
-
-[Your context here]
-
----
-
-## Notes
-
-- [Note 1]
-- [Note 2]
+## 10. 自定义规则
 ```
+
+#### 创建新 Agent 时的检查清单
+
+- [ ] 复制 `CLAUDE.md` 模板到项目根目录
+- [ ] 填写 **角色定义**（第 1 节）
+- [ ] 更新 **关键文件速查**（第 2 节）
+- [ ] 填写 **项目特定上下文**（第 9 节）
+- [ ] 添加 **自定义规则**（第 10 节）
+- [ ] 如需要并行开发，保留第 4-8 节
+- [ ] 创建 `PROGRESS.md` 文件
+
+#### 完整 CLAUDE.md 模板
+
+> 模板文件：`./CLAUDE.md`
 
 ### PROGRESS.md
 
