@@ -188,7 +188,172 @@ Step 6: Iterate based on real usage
 
 ---
 
-## 6. Documentation Templates
+## 6. Project Setup Templates
+
+When establishing a new project, include these two files for consistent context management:
+
+### CLAUDE.md
+
+Provides context to Claude Code when working in the directory.
+
+```markdown
+# CLAUDE.md
+
+This file provides context to Claude Code when working in this directory.
+
+---
+
+## Role
+
+Claude should act as: [Your preferred role]
+
+---
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `PROGRESS.md` | Dashboard of all active projects |
+
+---
+
+## Current Focus
+
+**Primary:** [Main project/goal]
+**Secondary:** [Next priority]
+
+---
+
+## Rules
+
+1. [Rule 1]
+2. [Rule 2]
+3. [Rule 3]
+
+---
+
+## Session Start Protocol
+
+When starting a new session:
+1. Read `PROGRESS.md` to understand current state
+2. [Add your own checks]
+
+---
+
+## Project-Specific Context
+
+[Your context here]
+
+---
+
+## Notes
+
+- [Note 1]
+- [Note 2]
+```
+
+### PROGRESS.md
+
+A dashboard that answers: What am I working on? What's waiting? What have I shipped?
+
+```markdown
+# PROGRESS
+
+**Last Updated:** [Date]
+
+---
+
+## How This Works
+
+One file. All your projects. Updated when things change.
+
+**Not a to-do list.** A dashboard that answers:
+1. What am I working on?
+2. What's waiting?
+3. What have I shipped?
+
+---
+
+## IDEATION
+
+> Ideas you're exploring. Not committed yet.
+
+### [Idea Name]
+**Why:** [What problem does this solve?]
+**Next:** [What do you need to decide?]
+
+---
+
+## DESIGN
+
+> Committed projects in planning phase.
+
+### [Project Name]
+**Status:** Planning
+**Approach:** [How will you tackle this?]
+**Next:** [Specific next action]
+
+---
+
+## DEVELOPMENT
+
+> Actively building.
+
+### [Project Name]
+**Status:** [Current phase]
+**Location:** [Where this lives — file path, repo, URL]
+**What it does:** [1-2 sentences]
+**Current state:** [What works? What doesn't?]
+**Next:** [Specific next action]
+**Blockers:** [Anything stopping progress?]
+
+---
+
+## LIVE
+
+> Shipped and running.
+
+### [Project Name]
+**Status:** [Active / Maintenance / Stable]
+**What's live:** [Brief description]
+**Last touch:** [When you last worked on this]
+
+---
+
+## RECENTLY COMPLETED
+
+> What you've actually shipped. Proof of progress.
+
+**[Month Year]:**
+- [Thing you shipped] ([Date])
+- [Another thing] ([Date])
+
+---
+
+## ON ICE
+
+> Paused. Not deleted — just not active.
+
+### [Project Name]
+**Why paused:** [Reason]
+**Reactivate if:** [What would need to change?]
+
+---
+
+## Quick Reference
+
+**High energy?** → [Most important/hardest thing]
+**Low energy?** → [Easiest/maintenance tasks]
+**Quick win?** → [Smallest thing you can finish]
+
+---
+
+**Update this when things change. Weekly minimum.**
+```
+
+---
+
+## 7. Documentation Templates
 
 ### README Structure (Priority Order)
 
@@ -228,7 +393,7 @@ Get a user by ID.
 
 ---
 
-## 7. AI-Friendly Documentation
+## 8. AI-Friendly Documentation
 
 ### llms.txt Template
 
@@ -255,7 +420,7 @@ Get a user by ID.
 
 ---
 
-## 8. Key Principles Summary
+## 9. Key Principles Summary
 
 | Principle | Why It Matters |
 |-----------|----------------|
@@ -268,7 +433,7 @@ Get a user by ID.
 
 ---
 
-## 9. Anti-Patterns to Avoid
+## 10. Anti-Patterns to Avoid
 
 1. **Verbose explanations** - Prefer concise examples
 2. **Duplicated information** - Use references/ for detailed content
