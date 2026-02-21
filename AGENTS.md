@@ -193,39 +193,155 @@ A skill should only contain essential files for an AI agent to do the job.
 
 ## 7. Eval-Driven Development
 
-基于 Anthropic 的研究，评估是 Agent 开发的核心环节。
+基于 Anthropic 的研究，评估是 Agent 开发的核心环节。完整的评估体系是高质量 Agent 的基础。
 
 ### 7.1 为什么需要评估
 
-- **避免盲目飞行**：没有评估，无法区分真实回归和噪音
-- **加速迭代**：自动测试数百个场景
-- **新模型适配**：有评估可以快速确定新模型优劣
-- **产品-研究协作**：成为最高带宽的沟通渠道
+**避免盲目飞行**：没有评估，团队陷入"猜测和检查"的被动循环——等待用户投诉、手动复现、修复 bug、希望没有引入新问题。无法区分真实回归和噪音。
 
-### 7.2 评估组件
+**加速迭代**：自动测试数百个场景，在发布前验证改动。
 
-| 组件 | 定义 |
-|------|------|
-| **Task** | 单个测试，定义输入和成功标准 |
-| **Trial** | 任务的单次尝试 |
-| **Grader** | 评分逻辑，可包含多个断言 |
-| **Transcript** | 完整记录（输出、工具调用、推理）|
-| **Outcome** | 试验结束时的环境最终状态 |
+**新模型适配**：有评估可以快速确定新模型优劣，在几天内完成升级（而非数周）。
 
-### 7.3 迭代流程
+**产品-研究协作**：评估成为最高带宽的沟通渠道，定义研究人员可以优化的指标。
+
+**复合价值**：一旦建立评估，自动获得基线和回归测试（延迟、token 使用量、成本、错误率）。
+
+### 7.2 评估类型
+
+| 类型 | 定义 | 复杂度 | 适用场景 |
+|------|------|--------|---------|
+| **Single-turn** | Prompt → Response → Grading | 低 | 基础能力、简单任务 |
+| **Multi-turn** | Agent 使用工具多轮交互 | 中 | 工具调用、状态管理 |
+| **Agent Evals** | 复杂多轮 + 环境状态变化 | 高 | 完整 Agent 能力评估 |
+
+**关键区别**：Agent 评估中，错误可能在多轮中传播和累积，且前沿模型可能找到超越静态评估的创造性解决方案。
+
+### 7.3 评估组件详解
+
+| 组件 | 定义 | 别名 | 说明 |
+|------|------|------|------|
+| **Task** | 单个测试，定义输入和成功标准 | Problem, Test Case | 评估的基本单元 |
+| **Trial** | 任务的单次尝试 | Run | 因模型输出有变化，需多次运行取平均 |
+| **Grader** | 评分逻辑 | Checker | 可包含多个 assertions |
+| **Transcript** | 完整交互记录 | Trace, Trajectory | 包含输出、工具调用、推理过程 |
+| **Outcome** | 环境最终状态 | Final State | 如数据库中的预订记录 |
+| **Evaluation Harness** | 评估基础设施 | Test Runner | 并发运行、记录步骤、聚合结果 |
+| **Agent Harness** | Agent 运行系统 | Scaffold | 处理输入、编排工具调用 |
+| **Evaluation Suite** | 任务集合 | Test Suite | 针对特定能力的任务组 |
+
+### 7.4 Grader 类型与实现
+
+| 类型 | 说明 | 适用场景 | 示例 |
+|------|------|---------|------|
+| **Exact Match** | 精确匹配输出 | 结构化输出 | `response == expected` |
+| **Contains** | 包含特定内容 | 文本验证 | `"success" in response` |
+| **Semantic Match** | 语义匹配 | 开放式回答 | 嵌入向量相似度 |
+| **Static Analysis** | 静态分析 | 代码评估 | 编译检查、单元测试 |
+| **Outcome-based** | 基于环境状态 | 状态变更验证 | 检查数据库、文件系统 |
+| **LLM-as-Judge** | LLM 评分 | 主观质量评估 | 使用评分标准判断 |
+| **Browser Agent** | 浏览器自动化 | UI 验证 | 端到端功能测试 |
+
+**Grader 设计原则**：
+- 避免过度严格：允许格式、措辞的合理变化
+- 关注 Outcome 而非 Transcript：代理说"已预订"不等于真的预订了
+- 多个 Graders：一个 Task 可有多个 Graders，每个包含多个 assertions
+
+### 7.5 评估迭代流程
 
 ```
-1. 建立基线评估
-    ↓
-2. 实现/修改 Agent
-    ↓
-3. 运行评估
-    ↓
-4. 分析失败案例
-    ↓
-5. 优化 Prompt/工具
-    ↓
-6. 重复步骤 3-5
+Step 1: 建立基线评估
+    - 定义成功标准
+    - 创建初始 Task 集合
+    - 实现基础 Graders
+    
+Step 2: 实现/修改 Agent
+    - 开发新功能或修复问题
+    
+Step 3: 运行评估（多次 Trial）
+    - 建议每个 Task 运行 3-5 次
+    - 记录 Transcript 和 Outcome
+    
+Step 4: 分析失败案例
+    - 查看失败 Trial 的 Transcript
+    - 区分真正失败 vs 评估过于严格
+    - 识别工具描述问题
+    
+Step 5: 优化 Prompt/工具/Grader
+    - 修复 Agent 问题
+    - 或调整 Grader 使其更合理
+    
+Step 6: 重复步骤 3-5
+```
+
+### 7.6 评估最佳实践
+
+**设计阶段**：
+1. **尽早建立评估**：编码预期行为，消除歧义
+2. **基于真实用例**：从生产环境提取场景，避免"玩具"问题
+3. **可验证的响应**：每个 Task 都有明确的验证方式
+
+**运行阶段**：
+4. **多次 Trial**：模型输出有随机性，单次运行不可靠
+5. **关注 Outcome**：不仅看输出文本，更要看环境最终状态
+6. **收集多维度指标**：准确率、延迟、token 消耗、成本、工具调用次数
+
+**维护阶段**：
+7. **定期人工校准**：LLM graders 需要周期性人工验证
+8. **分离评估套件**：质量基准测试 vs 回归测试
+9. **版本控制评估**：Task 和 Grader 也应版本控制
+
+### 7.7 评估维度示例
+
+**Descript 视频编辑 Agent**：
+- 不破坏现有功能（Don't break things）
+- 正确执行用户请求（Do what I asked）
+- 执行质量（Do it well）
+
+**Bolt AI 评估系统**：
+- 静态分析评分输出
+- 浏览器 Agent 测试应用
+- LLM 评判指令遵循
+
+**通用维度**：
+- 功能正确性（Functional Correctness）
+- 指令遵循（Instruction Following）
+- 简洁性（Concision）
+- 过度工程（Over-engineering）
+- 错误处理（Error Handling）
+
+### 7.8 评估目录结构
+
+```
+evals/
+├── README.md              # 评估说明和运行指南
+├── config.yaml           # 评估配置（模型、并发数、重试次数）
+├── harness.py            # 评估运行器主程序
+├── tasks/                # 评估任务定义
+│   ├── __init__.py
+│   ├── base.py          # 基础 Task 类
+│   ├── coding/          # 编码任务
+│   │   ├── __init__.py
+│   │   ├── create_mcp_server.json
+│   │   └── refactor_code.json
+│   ├── research/        # 研究任务
+│   └── customer_support/ # 客服任务
+├── graders/             # 评分逻辑
+│   ├── __init__.py
+│   ├── base.py         # 基础 Grader 类
+│   ├── exact_match.py
+│   ├── llm_judge.py
+│   ├── outcome_check.py
+│   └── static_analysis.py
+├── fixtures/           # 测试数据和环境
+│   ├── codebases/     # 代码库模板
+│   ├── databases/     # 数据库初始状态
+│   └── documents/     # 测试文档
+└── results/           # 评估结果（gitignored）
+    ├── 2025-02-21/
+    │   ├── run_001.json
+    │   └── summary.html
+    └── latest.json
 ```
 
 ---
